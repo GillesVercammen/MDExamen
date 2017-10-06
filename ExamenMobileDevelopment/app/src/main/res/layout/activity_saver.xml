@@ -17,7 +17,7 @@
             android:id="@+id/textView3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Beschrijving:" />
+            android:text="@string/beschrijving" />
 
         <EditText
             android:id="@+id/editText3"
@@ -25,12 +25,12 @@
             android:layout_height="200dp"
             android:ems="10"
             android:inputType="textPersonName"
-            android:hint="Beschrijving ...." />
+            android:hint="@string/typ_beschrijving" />
 
         <Button
             android:id="@+id/button3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Button" />
+            android:text="@string/save_location" />
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>

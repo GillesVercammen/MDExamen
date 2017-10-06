@@ -153,8 +153,10 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             helper.deleteAll();
+                            mapView.getOverlays().clear();
+                            mapView.getController().setCenter(new GeoPoint(51.1596941, 4.51040686514902));
+                            mapView.invalidate();
                             dialog.dismiss();
-
                         }
                     });
                     alert.setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -164,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
                     alert.show();
-                    this.mapView.invalidate();
+
                 }
                 break;
         }
