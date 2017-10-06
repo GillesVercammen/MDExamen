@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -45,6 +46,9 @@ public class MainActivity extends AppCompatActivity {
     private RequestQueue mRequestQueue;
     private JSONObject zones;
     final ArrayList<OverlayItem> items = new ArrayList<OverlayItem>();
+    final ArrayList<Coordinates> latLongList = new ArrayList<Coordinates>();
+    private MySqlLiteHelper helper;
+
 
     private String urlSearch = "http://nominatim.openstreetmap.org/search?q=";
     private String urlZones = "http://datasets.antwerpen.be/v4/gis/paparkeertariefzones.json";
@@ -54,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        helper = new MySqlLiteHelper(this);
 
         mapView = (MapView)findViewById(R.id.mapview);
         mapView.setTileSource(TileSourceFactory.MAPNIK);
@@ -62,13 +67,11 @@ public class MainActivity extends AppCompatActivity {
         mapView.getController().setZoom(18);
 
         //default = meistraat
-        mapView.getController().setCenter(new GeoPoint(51.2244, 4.38566));
+        mapView.getController().setCenter(new GeoPoint(51.1596941, 4.51040686514902));
 
         mRequestQueue = Volley.newRequestQueue(this);
         searchField = (TextView)findViewById(R.id.search_txtview);
         searchButton = (Button)findViewById(R.id.search_button);
-
-
         searchButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
@@ -111,6 +114,16 @@ public class MainActivity extends AppCompatActivity {
         if(checkIntent()){
             addMarker((GeoPoint) getIntent().getSerializableExtra("LOCATION"));
         }
+        int size = helper.getAllCoordinates().size();
+       if (size > 0) {
+            for (int i = 0; i < size ; i++) {
+                GeoPoint geo = new GeoPoint(helper.getAllCoordinates().get(i).getLat(), helper.getAllCoordinates().get(i).getLon());
+                addMarker(geo);
+            }
+        }
+
+
+
     }
 
     @Override

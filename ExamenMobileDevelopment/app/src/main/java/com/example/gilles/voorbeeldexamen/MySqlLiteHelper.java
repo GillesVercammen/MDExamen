@@ -2,10 +2,12 @@ package com.example.gilles.voorbeeldexamen;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Gilles on 6-10-2017.
@@ -16,6 +18,7 @@ public class MySqlLiteHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "map.db";
     private static final String TABLE_LOCATIONS = "locations";
     private static final int DATABASE_VERSION = 5;
+    final ArrayList<Coordinates> latLongList = new ArrayList<Coordinates>();
 
     public MySqlLiteHelper(Context context) {
 
@@ -46,5 +49,21 @@ public class MySqlLiteHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-    
+    public ArrayList<Coordinates> getAllCoordinates() {
+
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor  cursor = db.rawQuery("select longitude,latitude from locations",null);
+
+        if (cursor.moveToFirst()) {
+            while (!cursor.isAfterLast()) {
+                Double lon = cursor.getDouble(cursor.getColumnIndex("longitude"));
+                Double lat = cursor.getDouble(cursor.getColumnIndex("latitude"));
+
+                latLongList.add(new Coordinates(lat, lon));
+                cursor.moveToNext();
+            }
+        }
+        return latLongList;
+    }
 }
