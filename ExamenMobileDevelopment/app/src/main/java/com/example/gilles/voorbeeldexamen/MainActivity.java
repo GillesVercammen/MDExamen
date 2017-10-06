@@ -131,7 +131,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
+    /*  check of de druk op het scherm binnen de mapview ligt (anders telt drukken op inputfield en button mee
+        checken of de druk op het scherm een longpress is (langer als 2 sec)
+        vraag voor confirmatie on delete
+        ga naar opslaan scherm wanneer druk korter is als 2 sec
+     */
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         int actionType = ev.getAction();
@@ -172,8 +176,9 @@ public class MainActivity extends AppCompatActivity {
         return super.dispatchTouchEvent(ev);
     }
 
-
-
+    /*
+    check of er een intent met data aanwezig is, nodig voor marker te zetten, anders crash boem crash
+     */
     private boolean checkIntent(){
         GeoPoint location = (GeoPoint) getIntent().getSerializableExtra("LOCATION");
         boolean check = false;
@@ -183,7 +188,9 @@ public class MainActivity extends AppCompatActivity {
 
         return check;
     }
-
+    /*
+    add marker op de map
+     */
     private void addMarker(GeoPoint g) {
         OverlayItem myLocationOverlayItem = new OverlayItem("Here", "Current Position", g);
         Drawable myCurrentLocationMarker = ResourcesCompat.getDrawable(getResources(), R.drawable.marker, null);
@@ -204,8 +211,10 @@ public class MainActivity extends AppCompatActivity {
         this.mapView.getOverlays().add(currentLocationOverlay);
         this.mapView.invalidate();
     }
-
-    boolean isWithinMapBounds(int xPoint, int yPoint) {
+    /*
+        checken of een x en y coordinaat binnen de mapview boundaries zit
+     */
+    private boolean isWithinMapBounds(int xPoint, int yPoint) {
         int[] l = new int[2];
         mapView.getLocationOnScreen(l);
         int x = l[0];
@@ -218,7 +227,9 @@ public class MainActivity extends AppCompatActivity {
         }
         return true;
     }
-
+    /*
+    keyboard laten verdwijnen
+     */
     private void hideSoftKeyBoard(){
         InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
 
