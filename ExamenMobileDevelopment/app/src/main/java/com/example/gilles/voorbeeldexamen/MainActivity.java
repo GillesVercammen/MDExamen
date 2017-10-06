@@ -74,13 +74,10 @@ public class MainActivity extends AppCompatActivity {
         //default = meistraat
         mapView.getController().setCenter(new GeoPoint(51.1596941, 4.51040686514902));
 
-
-
-
-
         mRequestQueue = Volley.newRequestQueue(this);
         searchField = (TextView)findViewById(R.id.search_txtview);
         searchButton = (Button)findViewById(R.id.search_button);
+
         searchButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
@@ -119,10 +116,12 @@ public class MainActivity extends AppCompatActivity {
                 mRequestQueue.add(jr);
             }
         });
-
+        //Check if there is an intent with the checkIntent method
         if(checkIntent()){
             addMarker((GeoPoint) getIntent().getSerializableExtra("LOCATION"));
+            mapView.getController().setCenter((GeoPoint) getIntent().getSerializableExtra("LOCATION"));
         }
+
         int size = helper.getAllCoordinates().size();
        if (size > 0) {
             for (int i = 0; i < size ; i++) {
