@@ -1,14 +1,18 @@
 package com.example.gilles.voorbeeldexamen;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.res.ResourcesCompat;
+import android.support.v4.media.MediaMetadataCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -39,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String LOCATION = "LOCATION";
     private static final String BESCHRIJVING = "BESCHRIJVING";
+    private static final Long LONG_CLICK = 2000L;
 
     private TextView searchField;
     private Button searchButton;
@@ -49,9 +54,9 @@ public class MainActivity extends AppCompatActivity {
     final ArrayList<Coordinates> latLongList = new ArrayList<Coordinates>();
     private MySqlLiteHelper helper;
 
-
     private String urlSearch = "http://nominatim.openstreetmap.org/search?q=";
     private String urlZones = "http://datasets.antwerpen.be/v4/gis/paparkeertariefzones.json";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +73,10 @@ public class MainActivity extends AppCompatActivity {
 
         //default = meistraat
         mapView.getController().setCenter(new GeoPoint(51.1596941, 4.51040686514902));
+
+
+
+
 
         mRequestQueue = Volley.newRequestQueue(this);
         searchField = (TextView)findViewById(R.id.search_txtview);
@@ -121,25 +130,47 @@ public class MainActivity extends AppCompatActivity {
                 addMarker(geo);
             }
         }
-
-
-
     }
+
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         int actionType = ev.getAction();
         switch(actionType) {
             case MotionEvent.ACTION_UP:
-                Projection proj = this.mapView.getProjection();
-                GeoPoint loc = (GeoPoint)proj.fromPixels((int)ev.getX(), (int)ev.getY() - (searchField.getHeight() * 2));
+                if(isWithinMapBounds(Math.round(ev.getX()),Math.round(ev.getY())) && ev.getEventTime() - ev.getDownTime() < LONG_CLICK)
+                {
+                    Projection proj = this.mapView.getProjection();
+                    GeoPoint loc = (GeoPoint)proj.fromPixels((int)ev.getX(), (int)ev.getY() - (searchField.getHeight() * 2));
+                    Intent nextScreenIntent = new Intent(this, SaverActivity.class);
+                    nextScreenIntent.putExtra(LOCATION, (Serializable) loc);
+                    startActivity(nextScreenIntent);
+                } else if (isWithinMapBounds(Math.round(ev.getX()),Math.round(ev.getY())) && ev.getEventTime() - ev.getDownTime() >= LONG_CLICK ){
+                    AlertDialog.Builder alert = new AlertDialog.Builder(MainActivity.this);
+                    alert.setTitle("Delete");
+                    alert.setMessage("Are you sure you want to delete?");
+                    alert.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            helper.deleteAll();
+                            dialog.dismiss();
 
-                Intent nextScreenIntent = new Intent(this, SaverActivity.class);
-                nextScreenIntent.putExtra(LOCATION, (Serializable) loc);
-                startActivity(nextScreenIntent);
+                        }
+                    });
+                    alert.setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+                    alert.show();
+                    this.mapView.invalidate();
+                }
+                break;
         }
         return super.dispatchTouchEvent(ev);
     }
+
 
 
     private boolean checkIntent(){
@@ -171,6 +202,20 @@ public class MainActivity extends AppCompatActivity {
                 }, resourceProxy);
         this.mapView.getOverlays().add(currentLocationOverlay);
         this.mapView.invalidate();
+    }
+
+    boolean isWithinMapBounds(int xPoint, int yPoint) {
+        int[] l = new int[2];
+        mapView.getLocationOnScreen(l);
+        int x = l[0];
+        int y = l[1];
+        int w = mapView.getWidth();
+        int h = mapView.getHeight();
+
+        if (xPoint< x || xPoint> x + w || yPoint< y || yPoint> y + h) {
+            return false;
+        }
+        return true;
     }
 
     private void hideSoftKeyBoard(){

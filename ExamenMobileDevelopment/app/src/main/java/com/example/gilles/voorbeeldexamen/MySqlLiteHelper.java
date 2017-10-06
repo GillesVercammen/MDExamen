@@ -50,10 +50,8 @@ public class MySqlLiteHelper extends SQLiteOpenHelper {
     }
 
     public ArrayList<Coordinates> getAllCoordinates() {
-
-
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor  cursor = db.rawQuery("select longitude,latitude from locations",null);
+        Cursor  cursor = db.rawQuery("select longitude,latitude from " + TABLE_LOCATIONS,null);
 
         if (cursor.moveToFirst()) {
             while (!cursor.isAfterLast()) {
@@ -65,5 +63,10 @@ public class MySqlLiteHelper extends SQLiteOpenHelper {
             }
         }
         return latLongList;
+    }
+
+    public void deleteAll() {
+        SQLiteDatabase db = this.getReadableDatabase();
+        db.execSQL("delete from " + TABLE_LOCATIONS);
     }
 }
